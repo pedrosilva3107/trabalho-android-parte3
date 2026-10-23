@@ -1,4 +1,4 @@
-package br.edu.up.app
+package br.edu.up.app.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,27 +25,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.edu.up.app.viewmodel.OpcoesViewModel
 
 @Composable
 fun TelaOpcoes(
+    opcoesViewModel: OpcoesViewModel,
     paleta: Paleta,
-    corPostit: Color,
-    corPostitIndex: Int,
-    tamanhoFonte: Int,
-    modoEscuro: Boolean,
-    onCorPostit: (Int) -> Unit,
-    onDiminuirFonte: () -> Unit,
-    onAumentarFonte: () -> Unit,
-    onAlternarModoEscuro: () -> Unit,
-    onVoltar: () -> Unit
+    corPostit: Color
 ) {
+    val corPostitIndex = opcoesViewModel.corPostitIndex
+    val tamanhoFonte = opcoesViewModel.tamanhoFonte
+    val modoEscuro = opcoesViewModel.modoEscuro
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(paleta.fundo)
     ) {
         FaixaTopo(paleta)
-        BotaoVoltar(paleta, onVoltar)
         TituloTela("Opções", paleta, centralizado = true)
 
         Column(
@@ -84,7 +81,7 @@ fun TelaOpcoes(
                                 color = paleta.texto,
                                 shape = CircleShape
                             )
-                            .clickable { onCorPostit(i) }
+                            .clickable { opcoesViewModel.escolherCor(i) }
                     )
                 }
             }
@@ -98,7 +95,7 @@ fun TelaOpcoes(
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 OutlinedButton(
-                    onClick = onDiminuirFonte,
+                    onClick = { opcoesViewModel.diminuirFonte() },
                     enabled = tamanhoFonte > 12,
                     colors = coresBotao
                 ) {
@@ -115,7 +112,7 @@ fun TelaOpcoes(
                     textAlign = TextAlign.Center
                 )
                 OutlinedButton(
-                    onClick = onAumentarFonte,
+                    onClick = { opcoesViewModel.aumentarFonte() },
                     enabled = tamanhoFonte < 24,
                     colors = coresBotao
                 ) {
@@ -135,7 +132,7 @@ fun TelaOpcoes(
                     fontSize = 16.sp,
                     modifier = Modifier.weight(1f)
                 )
-                OutlinedButton(onClick = onAlternarModoEscuro, colors = coresBotao) {
+                OutlinedButton(onClick = { opcoesViewModel.alternarModoEscuro() }, colors = coresBotao) {
                     Text(if (modoEscuro) "Ligado" else "Desligado")
                 }
             }

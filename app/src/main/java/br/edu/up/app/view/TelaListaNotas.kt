@@ -1,4 +1,4 @@
-package br.edu.up.app
+package br.edu.up.app.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,17 +25,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.edu.up.app.model.Nota
+import br.edu.up.app.model.Usuario
+import br.edu.up.app.viewmodel.NotaViewModel
 
 @Composable
 fun TelaListaNotas(
-    notas: List<Nota>,
+    notaViewModel: NotaViewModel,
+    usuario: Usuario,
     paleta: Paleta,
     corPostit: Color,
     tamanhoFonte: Int,
     onCriar: () -> Unit,
-    onAbrir: (Nota) -> Unit,
-    onOpcoes: () -> Unit
+    onAbrir: (Nota) -> Unit
 ) {
+    // Busca as notas no banco ao abrir a tela (e de novo se o usuário mudar).
+    LaunchedEffect(usuario.id) {
+        notaViewModel.carregarNotas(usuario.id)
+    }
+
+    val notas = notaViewModel.notas
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -48,13 +59,19 @@ fun TelaListaNotas(
                     .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Notas",
-                    color = paleta.texto,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Notas",
+                        color = paleta.texto,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Olá, ${usuario.nome}",
+                        color = paleta.textoFraco,
+                        fontSize = 13.sp
+                    )
+                }
                 Text(
                     text = "${notas.size} notas",
                     color = paleta.textoFraco,
@@ -104,17 +121,6 @@ fun TelaListaNotas(
                     }
                 }
             }
-        }
-
-        FloatingActionButton(
-            onClick = onOpcoes,
-            containerColor = corPostit,
-            contentColor = paleta.textoPostit,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(24.dp)
-        ) {
-            Text(text = "⚙", fontSize = 20.sp)
         }
 
         FloatingActionButton(

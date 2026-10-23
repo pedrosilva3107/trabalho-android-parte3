@@ -1,4 +1,4 @@
-package br.edu.up.app
+package br.edu.up.app.view
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
