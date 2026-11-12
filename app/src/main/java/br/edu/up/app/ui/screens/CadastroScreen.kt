@@ -1,11 +1,12 @@
-package br.edu.up.app.view
+package br.edu.up.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,15 +15,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import br.edu.up.app.viewmodel.UsuarioViewModel
+import br.edu.up.app.ui.components.Aviso
+import br.edu.up.app.ui.components.BotaoSalvar
+import br.edu.up.app.ui.components.BotaoVoltar
+import br.edu.up.app.ui.components.CampoTexto
+import br.edu.up.app.ui.components.FaixaTopo
+import br.edu.up.app.ui.components.TituloTela
+import br.edu.up.app.ui.viewmodel.AuthViewModel
 
 // Create do CRUD de usuários. Usada no "Criar conta" (sem login)
 // e no "Novo usuário" (dentro do app).
 @Composable
-fun TelaCadastro(
-    usuarioViewModel: UsuarioViewModel,
-    paleta: Paleta,
+fun CadastroScreen(
+    authViewModel: AuthViewModel,
     corPostit: Color,
     titulo: String,
     onConcluido: () -> Unit,
@@ -32,16 +37,22 @@ fun TelaCadastro(
     var usuario by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf("") }
     var confirmacao by remember { mutableStateOf("") }
-    var erro by remember { mutableStateOf("") }
+
+    LaunchedEffect(authViewModel.concluido) {
+        if (authViewModel.concluido) {
+            authViewModel.consumirResultado()
+            onConcluido()
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(paleta.fundo)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        FaixaTopo(paleta)
-        BotaoVoltar(paleta, onVoltar)
-        TituloTela(titulo, paleta)
+        FaixaTopo()
+        BotaoVoltar(onVoltar)
+        TituloTela(titulo)
 
         Column(
             modifier = Modifier
@@ -53,14 +64,12 @@ fun TelaCadastro(
                 valor = nome,
                 onValorChange = { nome = it },
                 rotulo = "Nome",
-                paleta = paleta,
                 corPostit = corPostit
             )
             CampoTexto(
                 valor = usuario,
                 onValorChange = { usuario = it },
                 rotulo = "Usuário",
-                paleta = paleta,
                 corPostit = corPostit,
                 modifier = Modifier.padding(top = 14.dp)
             )
@@ -68,7 +77,6 @@ fun TelaCadastro(
                 valor = senha,
                 onValorChange = { senha = it },
                 rotulo = "Senha",
-                paleta = paleta,
                 corPostit = corPostit,
                 senha = true,
                 modifier = Modifier.padding(top = 14.dp)
@@ -77,29 +85,16 @@ fun TelaCadastro(
                 valor = confirmacao,
                 onValorChange = { confirmacao = it },
                 rotulo = "Confirmar senha",
-                paleta = paleta,
                 corPostit = corPostit,
                 senha = true,
                 modifier = Modifier.padding(top = 14.dp)
             )
 
-            if (erro.isNotEmpty()) {
-                Text(
-                    text = erro,
-                    color = paleta.roxo,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 10.dp)
-                )
-            }
+            Aviso(authViewModel.mensagem, Modifier.padding(top = 10.dp))
 
             Column(modifier = Modifier.padding(top = 28.dp, bottom = 24.dp)) {
-                BotaoSalvar(texto = "Cadastrar", paleta = paleta) {
-                    val falha = usuarioViewModel.cadastrar(nome, usuario, senha, confirmacao)
-                    if (falha == null) {
-                        onConcluido()
-                    } else {
-                        erro = falha
-                    }
+                BotaoSalvar(texto = "Cadastrar") {
+                    authViewModel.cadastrar(nome, usuario, senha, confirmacao)
                 }
             }
         }

@@ -1,4 +1,4 @@
-package br.edu.up.app.view
+package br.edu.up.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,23 +26,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.edu.up.app.model.Nota
-import br.edu.up.app.model.Usuario
-import br.edu.up.app.viewmodel.NotaViewModel
+import br.edu.up.app.data.model.Nota
+import br.edu.up.app.data.model.Usuario
+import br.edu.up.app.ui.components.PostitCard
+import br.edu.up.app.ui.theme.TextoPostit
+import br.edu.up.app.ui.viewmodel.NotaViewModel
 
+// Read do CRUD de notas.
 @Composable
-fun TelaListaNotas(
+fun ListaNotasScreen(
     notaViewModel: NotaViewModel,
     usuario: Usuario,
-    paleta: Paleta,
     corPostit: Color,
     tamanhoFonte: Int,
     onCriar: () -> Unit,
-    onAbrir: (Nota) -> Unit
+    onAbrir: (Long) -> Unit
 ) {
     // Busca as notas no banco ao abrir a tela (e de novo se o usuário mudar).
     LaunchedEffect(usuario.id) {
-        notaViewModel.carregarNotas(usuario.id)
+        notaViewModel.listar()
     }
 
     val notas = notaViewModel.notas
@@ -49,7 +52,7 @@ fun TelaListaNotas(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(paleta.fundo)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -62,19 +65,19 @@ fun TelaListaNotas(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Notas",
-                        color = paleta.texto,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 26.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "Olá, ${usuario.nome}",
-                        color = paleta.textoFraco,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 13.sp
                     )
                 }
                 Text(
                     text = "${notas.size} notas",
-                    color = paleta.textoFraco,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp
                 )
             }
@@ -82,7 +85,7 @@ fun TelaListaNotas(
             if (notas.isEmpty()) {
                 Text(
                     text = "Nenhuma nota ainda. Toque no + para criar a primeira.",
-                    color = paleta.textoFraco,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
             } else {
@@ -100,19 +103,17 @@ fun TelaListaNotas(
                             CartaoNota(
                                 nota = notas[esquerda],
                                 cor = corPostit,
-                                paleta = paleta,
                                 tamanhoFonte = tamanhoFonte,
                                 modifier = Modifier.weight(1f),
-                                onClick = { onAbrir(notas[esquerda]) }
+                                onClick = { onAbrir(notas[esquerda].id) }
                             )
                             if (direita < notas.size) {
                                 CartaoNota(
                                     nota = notas[direita],
                                     cor = corPostit,
-                                    paleta = paleta,
                                     tamanhoFonte = tamanhoFonte,
                                     modifier = Modifier.weight(1f),
-                                    onClick = { onAbrir(notas[direita]) }
+                                    onClick = { onAbrir(notas[direita].id) }
                                 )
                             } else {
                                 Spacer(modifier = Modifier.weight(1f))
@@ -126,7 +127,7 @@ fun TelaListaNotas(
         FloatingActionButton(
             onClick = onCriar,
             containerColor = corPostit,
-            contentColor = paleta.textoPostit,
+            contentColor = TextoPostit,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
@@ -140,7 +141,6 @@ fun TelaListaNotas(
 private fun CartaoNota(
     nota: Nota,
     cor: Color,
-    paleta: Paleta,
     tamanhoFonte: Int,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
@@ -153,7 +153,7 @@ private fun CartaoNota(
     ) {
         Text(
             text = nota.texto,
-            color = paleta.textoPostit,
+            color = TextoPostit,
             fontSize = tamanhoFonte.sp,
             textAlign = TextAlign.Center,
             maxLines = 5,

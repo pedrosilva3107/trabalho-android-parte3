@@ -1,4 +1,4 @@
-package br.edu.up.app.view
+package br.edu.up.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,41 +9,43 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.edu.up.app.viewmodel.OpcoesViewModel
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import br.edu.up.app.ui.components.FaixaTopo
+import br.edu.up.app.ui.components.PostitCard
+import br.edu.up.app.ui.components.TituloTela
+import br.edu.up.app.ui.theme.CORES_POSTIT
+import br.edu.up.app.ui.theme.TextoPostit
+import br.edu.up.app.ui.viewmodel.OpcoesViewModel
 
 @Composable
-fun TelaOpcoes(
-    opcoesViewModel: OpcoesViewModel,
-    paleta: Paleta,
-    corPostit: Color
-) {
+fun OpcoesScreen(opcoesViewModel: OpcoesViewModel) {
     val corPostitIndex = opcoesViewModel.corPostitIndex
     val tamanhoFonte = opcoesViewModel.tamanhoFonte
     val modoEscuro = opcoesViewModel.modoEscuro
+    val corTexto = MaterialTheme.colorScheme.onBackground
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(paleta.fundo)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        FaixaTopo(paleta)
-        TituloTela("Opções", paleta, centralizado = true)
+        FaixaTopo()
+        TituloTela("Opções", centralizado = true)
 
         Column(
             modifier = Modifier
@@ -52,17 +54,17 @@ fun TelaOpcoes(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Rotulo("COR DO POST-IT", paleta)
+            Rotulo("COR DO POST-IT")
 
             PostitCard(
-                cor = corPostit,
+                cor = CORES_POSTIT[corPostitIndex],
                 modifier = Modifier
                     .padding(top = 8.dp)
                     .size(width = 150.dp, height = 120.dp)
             ) {
                 Text(
                     text = "Exemplo",
-                    color = paleta.textoPostit,
+                    color = TextoPostit,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -78,7 +80,7 @@ fun TelaOpcoes(
                             .background(CORES_POSTIT[i], CircleShape)
                             .border(
                                 width = if (i == corPostitIndex) 3.dp else 1.dp,
-                                color = paleta.texto,
+                                color = corTexto,
                                 shape = CircleShape
                             )
                             .clickable { opcoesViewModel.escolherCor(i) }
@@ -86,9 +88,9 @@ fun TelaOpcoes(
                 }
             }
 
-            Rotulo("TAMANHO DA FONTE", paleta, topo = 32.dp)
+            Rotulo("TAMANHO DA FONTE", topo = 32.dp)
 
-            val coresBotao = ButtonDefaults.outlinedButtonColors(contentColor = paleta.texto)
+            val coresBotao = ButtonDefaults.outlinedButtonColors(contentColor = corTexto)
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -103,7 +105,7 @@ fun TelaOpcoes(
                 }
                 Text(
                     text = "${tamanhoFonte}sp",
-                    color = paleta.texto,
+                    color = corTexto,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
@@ -128,7 +130,7 @@ fun TelaOpcoes(
             ) {
                 Text(
                     text = "Modo escuro",
-                    color = paleta.texto,
+                    color = corTexto,
                     fontSize = 16.sp,
                     modifier = Modifier.weight(1f)
                 )
@@ -141,10 +143,10 @@ fun TelaOpcoes(
 }
 
 @Composable
-private fun Rotulo(texto: String, paleta: Paleta, topo: androidx.compose.ui.unit.Dp = 0.dp) {
+private fun Rotulo(texto: String, topo: Dp = 0.dp) {
     Text(
         text = texto,
-        color = paleta.textoFraco,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(top = topo)

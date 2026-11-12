@@ -1,12 +1,14 @@
-package br.edu.up.app.view
+package br.edu.up.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,35 +17,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import br.edu.up.app.viewmodel.UsuarioViewModel
+import br.edu.up.app.ui.components.Aviso
+import br.edu.up.app.ui.components.BotaoSalvar
+import br.edu.up.app.ui.components.BotaoVoltar
+import br.edu.up.app.ui.components.CampoTexto
+import br.edu.up.app.ui.components.FaixaTopo
+import br.edu.up.app.ui.components.TituloTela
+import br.edu.up.app.ui.viewmodel.UsuarioViewModel
 
-// Update e Delete do CRUD de usuários.
+// Update e Delete do CRUD de usuários. Recebe o id pela rota EditarUsuario(id).
 @Composable
-fun TelaEditarUsuario(
+fun EditarUsuarioScreen(
+    usuarioId: Long,
     usuarioViewModel: UsuarioViewModel,
-    paleta: Paleta,
     corPostit: Color,
     onVoltar: () -> Unit,
     onExcluiu: (excluiuPropriaConta: Boolean) -> Unit
 ) {
-    val usuario = usuarioViewModel.usuarioSelecionado ?: return
-    val ehVoce = usuario.id == usuarioViewModel.usuarioLogado?.id
+    LaunchedEffect(usuarioId) { usuarioViewModel.buscarPorId(usuarioId) }
+    LaunchedEffect(usuarioViewModel.salvo) {
+        if (usuarioViewModel.salvo) {
+            usuarioViewModel.consumirSalvo()
+            onVoltar()
+        }
+    }
+    LaunchedEffect(usuarioViewModel.excluido) {
+        if (usuarioViewModel.excluido) {
+            onExcluiu(usuarioViewModel.excluiuPropriaConta)
+        }
+    }
 
-    var nome by remember { mutableStateOf(usuario.nome) }
-    var login by remember { mutableStateOf(usuario.login) }
+    val ehVoce = usuarioId == usuarioViewModel.usuarioLogadoId
     var novaSenha by remember { mutableStateOf("") }
-    var erro by remember { mutableStateOf("") }
     var confirmarExclusao by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(paleta.fundo)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        FaixaTopo(paleta)
-        BotaoVoltar(paleta, onVoltar)
-        TituloTela("Editar usuário", paleta)
+        FaixaTopo()
+        BotaoVoltar(onVoltar)
+        TituloTela("Editar usuário")
 
         Column(
             modifier = Modifier
@@ -52,17 +67,15 @@ fun TelaEditarUsuario(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CampoTexto(
-                valor = nome,
-                onValorChange = { nome = it },
+                valor = usuarioViewModel.nome,
+                onValorChange = usuarioViewModel::mudarNome,
                 rotulo = "Nome",
-                paleta = paleta,
                 corPostit = corPostit
             )
             CampoTexto(
-                valor = login,
-                onValorChange = { login = it },
+                valor = usuarioViewModel.login,
+                onValorChange = usuarioViewModel::mudarLogin,
                 rotulo = "Usuário",
-                paleta = paleta,
                 corPostit = corPostit,
                 modifier = Modifier.padding(top = 14.dp)
             )
@@ -70,29 +83,16 @@ fun TelaEditarUsuario(
                 valor = novaSenha,
                 onValorChange = { novaSenha = it },
                 rotulo = "Nova senha (deixe vazio para manter)",
-                paleta = paleta,
                 corPostit = corPostit,
                 senha = true,
                 modifier = Modifier.padding(top = 14.dp)
             )
 
-            if (erro.isNotEmpty()) {
-                Text(
-                    text = erro,
-                    color = paleta.roxo,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 10.dp)
-                )
-            }
+            Aviso(usuarioViewModel.mensagem, Modifier.padding(top = 10.dp))
 
             Column(modifier = Modifier.padding(top = 28.dp)) {
-                BotaoSalvar(texto = "Salvar", paleta = paleta) {
-                    val falha = usuarioViewModel.atualizar(usuario, nome, login, novaSenha)
-                    if (falha == null) {
-                        onVoltar()
-                    } else {
-                        erro = falha
-                    }
+                BotaoSalvar(texto = "Salvar") {
+                    usuarioViewModel.salvar(novaSenha)
                 }
             }
 
@@ -100,8 +100,7 @@ fun TelaEditarUsuario(
             TextButton(
                 onClick = {
                     if (confirmarExclusao) {
-                        usuarioViewModel.deletar(usuario)
-                        onExcluiu(ehVoce)
+                        usuarioViewModel.excluir()
                     } else {
                         confirmarExclusao = true
                     }
@@ -113,7 +112,7 @@ fun TelaEditarUsuario(
                     ehVoce -> "Toque de novo: apaga sua conta, suas notas e sai do app"
                     else -> "Toque de novo para confirmar (as notas dele também serão apagadas)"
                 }
-                Text(text = texto, color = paleta.roxo)
+                Text(text = texto, color = MaterialTheme.colorScheme.primary)
             }
         }
     }

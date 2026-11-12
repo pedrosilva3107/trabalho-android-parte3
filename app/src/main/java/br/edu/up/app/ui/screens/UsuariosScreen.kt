@@ -1,4 +1,4 @@
-package br.edu.up.app.view
+package br.edu.up.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,30 +23,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.edu.up.app.model.Usuario
-import br.edu.up.app.viewmodel.UsuarioViewModel
+import br.edu.up.app.data.model.Usuario
+import br.edu.up.app.ui.components.PostitCard
+import br.edu.up.app.ui.theme.TextoPostit
+import br.edu.up.app.ui.viewmodel.UsuarioViewModel
 
 // Read do CRUD de usuários.
 @Composable
-fun TelaUsuarios(
+fun UsuariosScreen(
     usuarioViewModel: UsuarioViewModel,
-    paleta: Paleta,
     corPostit: Color,
     onNovo: () -> Unit,
-    onAbrir: (Usuario) -> Unit
+    onAbrir: (Long) -> Unit
 ) {
     // Busca os usuários no banco ao abrir a tela.
     LaunchedEffect(Unit) {
-        usuarioViewModel.carregarUsuarios()
+        usuarioViewModel.listar()
     }
 
     val usuarios = usuarioViewModel.usuarios
-    val idLogado = usuarioViewModel.usuarioLogado?.id
+    val idLogado = usuarioViewModel.usuarioLogadoId
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(paleta.fundo)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -57,14 +59,14 @@ fun TelaUsuarios(
             ) {
                 Text(
                     text = "Usuários",
-                    color = paleta.texto,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = "${usuarios.size} cadastrados",
-                    color = paleta.textoFraco,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp
                 )
             }
@@ -73,13 +75,12 @@ fun TelaUsuarios(
                 contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 100.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(usuarios) { usuario ->
+                items(usuarios, key = { it.id }) { usuario ->
                     CartaoUsuario(
                         usuario = usuario,
                         ehVoce = usuario.id == idLogado,
                         cor = corPostit,
-                        paleta = paleta,
-                        onClick = { onAbrir(usuario) }
+                        onClick = { onAbrir(usuario.id) }
                     )
                 }
             }
@@ -88,7 +89,7 @@ fun TelaUsuarios(
         FloatingActionButton(
             onClick = onNovo,
             containerColor = corPostit,
-            contentColor = paleta.textoPostit,
+            contentColor = TextoPostit,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp)
@@ -103,7 +104,6 @@ private fun CartaoUsuario(
     usuario: Usuario,
     ehVoce: Boolean,
     cor: Color,
-    paleta: Paleta,
     onClick: () -> Unit
 ) {
     PostitCard(
@@ -115,13 +115,13 @@ private fun CartaoUsuario(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = if (ehVoce) "${usuario.nome} (você)" else usuario.nome,
-                color = paleta.textoPostit,
+                color = TextoPostit,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = "@${usuario.login}",
-                color = paleta.textoPostit,
+                color = TextoPostit,
                 fontSize = 14.sp
             )
         }

@@ -1,4 +1,4 @@
-package br.edu.up.app.viewmodel
+package br.edu.up.app.ui.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
