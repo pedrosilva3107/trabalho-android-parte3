@@ -21,8 +21,6 @@ import kotlinx.coroutines.withContext
 class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = UsuarioDao(application)
 
-    val usuarioLogadoId: Long? get() = SessaoUsuario.usuarioId
-
     var usuarios by mutableStateOf<List<Usuario>>(emptyList())
         private set
     var usuario by mutableStateOf<Usuario?>(null)
@@ -42,7 +40,11 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     var mensagem by mutableStateOf<String?>(null)
         private set
 
-    private fun executar(op: suspend () -> Unit) {
+    // Id de quem está logado (para marcar "você" nas telas).
+    fun usuarioLogadoId(): Long? = SessaoUsuario.usuario?.id
+
+    // Roda a operação em segundo plano (Dispatchers.IO), só com sessão ativa.
+    private fun executar(op: () -> Unit) {
         if (carregando || salvo || excluido) return
         carregando = true
         mensagem = null
@@ -50,7 +52,7 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             try {
                 SessaoUsuario.exigirUsuario()
-                op()
+                withContext(Dispatchers.IO) { op() }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: SQLiteConstraintException) {
@@ -66,14 +68,15 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun listar() = executar {
-        usuarios = withContext(Dispatchers.IO) { dao.listar() }
+        usuarios = dao.listar()
     }
 
     fun buscarPorId(id: Long) {
         if (usuario?.id == id) return
         executar {
-            val encontrado = withContext(Dispatchers.IO) { dao.buscarPorId(id) }
-            usuario = requireNotNull(encontrado) { "Usuário não encontrado." }
+            val encontrado = dao.buscarPorId(id)
+            require(encontrado != null) { "Usuário não encontrado." }
+            usuario = encontrado
             nome = encontrado.nome
             login = encontrado.login
         }
@@ -89,22 +92,21 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
 
     // Senha em branco mantém a senha atual.
     fun salvar(novaSenha: String) = executar {
-        val selecionado = requireNotNull(usuario) { "Selecione um usuário." }
+        val selecionado = usuario
+        require(selecionado != null) { "Selecione um usuário." }
         val nomeLimpo = nome.trim()
         val loginLimpo = login.trim()
         CadastroValidator.validarAlteracao(nomeLimpo, loginLimpo, novaSenha)
 
-        withContext(Dispatchers.IO) {
-            if (novaSenha.isEmpty()) {
-                dao.alterar(selecionado.id, nomeLimpo, loginLimpo)
-            } else {
-                val salt = AuthManager.criarSalt()
-                val hash = AuthManager.gerarHash(novaSenha, salt)
-                try {
-                    dao.alterar(selecionado.id, nomeLimpo, loginLimpo, hash, salt)
-                } finally {
-                    hash.fill(0)
-                }
+        if (novaSenha.isEmpty()) {
+            dao.alterar(selecionado.id, nomeLimpo, loginLimpo)
+        } else {
+            val salt = AuthManager.criarSalt()
+            val hash = AuthManager.gerarHash(novaSenha, salt)
+            try {
+                dao.alterar(selecionado.id, nomeLimpo, loginLimpo, hash, salt)
+            } finally {
+                hash.fill(0)
             }
         }
 
@@ -116,9 +118,10 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
 
     // Quem decide o que fazer depois (voltar ou encerrar a sessão) é a navegação.
     fun excluir() = executar {
-        val selecionado = requireNotNull(usuario) { "Selecione um usuário." }
-        withContext(Dispatchers.IO) { dao.excluir(selecionado.id) }
-        excluiuPropriaConta = selecionado.id == SessaoUsuario.usuarioId
+        val selecionado = usuario
+        require(selecionado != null) { "Selecione um usuário." }
+        dao.excluir(selecionado.id)
+        excluiuPropriaConta = selecionado.id == SessaoUsuario.usuario?.id
         excluido = true
     }
 

@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -23,9 +22,6 @@ import br.edu.up.app.ui.screens.OpcoesScreen
 import br.edu.up.app.ui.screens.UsuariosScreen
 import br.edu.up.app.ui.theme.CORES_POSTIT
 import br.edu.up.app.ui.viewmodel.OpcoesViewModel
-
-// Login e Cadastro são as únicas telas que abrem sem sessão.
-fun NavDestination.ehPublica(): Boolean = hasRoute<Login>() || hasRoute<Cadastro>()
 
 // Sai de qualquer tela e volta ao login, limpando a pilha (o "voltar" não retorna ao app).
 fun NavHostController.irParaLogin(mensagem: String = "") {
@@ -49,9 +45,11 @@ fun AppNavigation(
 
     // Controle de sessão: se a tela atual exige login e ninguém está logado,
     // manda para o Login. Roda de novo a cada troca de tela ou de sessão.
+    // Login e Cadastro são as únicas telas que abrem sem sessão.
     LaunchedEffect(entradaAtual, usuarioLogado) {
-        val destino = navController.currentDestination ?: return@LaunchedEffect
-        if (!destino.ehPublica() && SessaoUsuario.usuario == null) {
+        val destino = entradaAtual?.destination ?: return@LaunchedEffect
+        val telaPublica = destino.hasRoute<Login>() || destino.hasRoute<Cadastro>()
+        if (!telaPublica && SessaoUsuario.usuario == null) {
             navController.irParaLogin()
         }
     }

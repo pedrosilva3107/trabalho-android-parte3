@@ -32,15 +32,17 @@ class NotaViewModel(application: Application) : AndroidViewModel(application) {
     var mensagem by mutableStateOf<String?>(null)
         private set
 
+    // Roda a operação em segundo plano (Dispatchers.IO).
     // A operação recebe o id de quem está logado (sem sessão, não roda).
-    private fun executar(op: suspend (usuarioId: Long) -> Unit) {
+    private fun executar(op: (usuarioId: Long) -> Unit) {
         if (carregando || salvo) return
         carregando = true
         mensagem = null
 
         viewModelScope.launch {
             try {
-                op(SessaoUsuario.exigirUsuario())
+                val usuarioId = SessaoUsuario.exigirUsuario()
+                withContext(Dispatchers.IO) { op(usuarioId) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IllegalArgumentException) {
@@ -54,14 +56,15 @@ class NotaViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun listar() = executar { usuarioId ->
-        notas = withContext(Dispatchers.IO) { dao.listarPorUsuario(usuarioId) }
+        notas = dao.listarPorUsuario(usuarioId)
     }
 
     fun buscarPorId(id: Long) {
         if (nota?.id == id) return
         executar { usuarioId ->
-            val encontrada = withContext(Dispatchers.IO) { dao.buscarPorId(id, usuarioId) }
-            nota = requireNotNull(encontrada) { "Nota não encontrada." }
+            val encontrada = dao.buscarPorId(id, usuarioId)
+            require(encontrada != null) { "Nota não encontrada." }
+            nota = encontrada
             texto = encontrada.texto
         }
     }
@@ -73,20 +76,22 @@ class NotaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun criar() = executar { usuarioId ->
         CadastroValidator.validarNota(texto)
-        withContext(Dispatchers.IO) { dao.inserir(usuarioId, texto.trim()) }
+        dao.inserir(usuarioId, texto.trim())
         salvo = true
     }
 
     fun salvar() = executar { usuarioId ->
-        val selecionada = requireNotNull(nota) { "Selecione uma nota." }
+        val selecionada = nota
+        require(selecionada != null) { "Selecione uma nota." }
         CadastroValidator.validarNota(texto)
-        withContext(Dispatchers.IO) { dao.alterar(selecionada.id, usuarioId, texto.trim()) }
+        dao.alterar(selecionada.id, usuarioId, texto.trim())
         salvo = true
     }
 
     fun excluir() = executar { usuarioId ->
-        val selecionada = requireNotNull(nota) { "Selecione uma nota." }
-        withContext(Dispatchers.IO) { dao.excluir(selecionada.id, usuarioId) }
+        val selecionada = nota
+        require(selecionada != null) { "Selecione uma nota." }
+        dao.excluir(selecionada.id, usuarioId)
         salvo = true
     }
 

@@ -14,11 +14,6 @@ internal class AppDatabase(context: Context) : SQLiteOpenHelper(
     VERSAO
 ) {
 
-    // Liga as chaves estrangeiras (no SQLite elas vêm desligadas).
-    override fun onConfigure(db: SQLiteDatabase) {
-        db.setForeignKeyConstraintsEnabled(true)
-    }
-
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             """
@@ -31,12 +26,13 @@ internal class AppDatabase(context: Context) : SQLiteOpenHelper(
             )
             """.trimIndent()
         )
-        // ON DELETE CASCADE: ao excluir um usuário, as notas dele saem junto.
+        // usuario_id guarda o dono da nota. Ao excluir um usuário,
+        // o UsuarioDao.excluir apaga as notas dele antes.
         db.execSQL(
             """
             CREATE TABLE notas(
                 id INTEGER PRIMARY KEY,
-                usuario_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+                usuario_id INTEGER NOT NULL,
                 texto TEXT NOT NULL
             )
             """.trimIndent()
@@ -45,7 +41,8 @@ internal class AppDatabase(context: Context) : SQLiteOpenHelper(
 
     // Obrigatório no SQLiteOpenHelper, mas o banco está na versão 1:
     // não existe versão anterior para migrar.
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+    }
 
     companion object {
         private const val NOME_BANCO = "notas.db"

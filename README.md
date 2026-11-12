@@ -82,7 +82,7 @@ aparece em roxo na tela). Quando uma operação termina, o ViewModel marca
 | Login funcional | `AuthViewModel.entrar()` confere o hash da senha (`AuthManager.validarSenha`) |
 | Cadastro de usuário | `CadastroScreen` + `AuthViewModel.cadastrar()` |
 | Controle de sessão | `auth/SessaoUsuario` + `LaunchedEffect` em `AppNavigation` |
-| Menu escondido no login/cadastro | `MainActivity`: o `bottomBar` só aparece com sessão e fora das telas públicas |
+| Menu escondido no login/cadastro | `MainActivity`: o `Menu` só aparece com sessão e fora das telas públicas |
 | Navegação | `navigation/` com Navigation Compose e rotas `@Serializable` |
 | MVVM | `data` (model) / `ui/viewmodel` / `ui/screens` |
 
@@ -90,7 +90,7 @@ aparece em roxo na tela). Quando uma operação termina, o ViewModel marca
 
 - `SessaoUsuario.usuario` guarda quem está logado; `null` = ninguém. É um
   `mutableStateOf`, então a navegação e as telas reagem quando muda.
-- Login e Cadastro são as únicas telas públicas (`ehPublica()` em `AppNavigation`).
+- Login e Cadastro são as únicas telas públicas (`hasRoute<Login>()` / `hasRoute<Cadastro>()`).
 - Um `LaunchedEffect` em `AppNavigation` roda a cada troca de tela: se a tela
   exige login e não há sessão, volta para o Login limpando a pilha.
 - Os ViewModels de notas e usuários chamam `SessaoUsuario.exigirUsuario()`
@@ -98,7 +98,7 @@ aparece em roxo na tela). Quando uma operação termina, o ViewModel marca
 - **Sair** (menu) chama `SessaoUsuario.encerrar()`.
 - Cada usuário vê **só as próprias notas**: toda consulta do `NotaDao` filtra
   por `usuario_id`.
-- Ao excluir a própria conta, as notas saem junto (`ON DELETE CASCADE`) e a
+- Ao excluir a própria conta, as notas saem junto (o `UsuarioDao.excluir` apaga as notas antes do usuário) e a
   sessão termina.
 - Ao editar o próprio nome/usuário, a sessão é atualizada na hora.
 
@@ -111,7 +111,7 @@ CREATE TABLE usuarios(id INTEGER PRIMARY KEY,
                       nome TEXT NOT NULL, login TEXT NOT NULL UNIQUE,
                       senha BLOB NOT NULL, salt BLOB NOT NULL);
 CREATE TABLE notas(id INTEGER PRIMARY KEY,
-                   usuario_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+                   usuario_id INTEGER NOT NULL,
                    texto TEXT NOT NULL);
 ```
 

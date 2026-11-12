@@ -89,9 +89,12 @@ internal class UsuarioDao(context: Context) {
         }
     }
 
-    // As notas do usuário são apagadas pelo ON DELETE CASCADE.
+    // Apaga primeiro as notas do usuário e depois o próprio usuário.
     fun excluir(id: Long) {
         AppDatabase(appContext).use { db ->
+            db.writableDatabase.delete(
+                "notas", "usuario_id = ?", arrayOf(id.toString())
+            )
             val excluidos = db.writableDatabase.delete(
                 "usuarios", "id = ?", arrayOf(id.toString())
             )

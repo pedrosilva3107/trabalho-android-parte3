@@ -11,8 +11,6 @@ internal object SessaoUsuario {
     var usuario by mutableStateOf<Usuario?>(null)
         private set
 
-    val usuarioId: Long? get() = usuario?.id
-
     fun iniciar(usuario: Usuario) {
         require(usuario.id > 0)
         this.usuario = usuario
@@ -20,14 +18,18 @@ internal object SessaoUsuario {
 
     // Chamado quando o próprio usuário edita nome/login.
     fun atualizar(usuario: Usuario) {
-        if (usuario.id == usuarioId) this.usuario = usuario
+        if (usuario.id == this.usuario?.id) this.usuario = usuario
     }
 
     fun encerrar() {
         usuario = null
     }
 
-    fun exigirUsuario(): Long = requireNotNull(usuarioId) {
-        "Faça login para continuar."
+    // Devolve o id de quem está logado. Sem sessão, o require lança o erro
+    // que vira mensagem na tela.
+    fun exigirUsuario(): Long {
+        val atual = usuario
+        require(atual != null) { "Faça login para continuar." }
+        return atual.id
     }
 }

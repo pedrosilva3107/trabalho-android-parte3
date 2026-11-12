@@ -27,15 +27,15 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     var mensagem by mutableStateOf<String?>(null)
         private set
 
-    // Roda a operação em segundo plano e transforma os erros em mensagem.
-    private fun executar(op: suspend () -> Boolean) {
+    // Roda a operação em segundo plano (Dispatchers.IO) e transforma os erros em mensagem.
+    private fun executar(op: () -> Boolean) {
         if (carregando || concluido) return
         carregando = true
         mensagem = null
 
         viewModelScope.launch {
             try {
-                concluido = op()
+                concluido = withContext(Dispatchers.IO) { op() }
                 if (!concluido) mensagem = "Usuário ou senha inválidos."
             } catch (e: CancellationException) {
                 throw e
@@ -56,14 +56,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         val loginLimpo = login.trim()
         CadastroValidator.validarCadastro(nomeLimpo, loginLimpo, senha, confirmacao)
 
-        withContext(Dispatchers.IO) {
-            val salt = AuthManager.criarSalt()
-            val senhaHash = AuthManager.gerarHash(senha, salt)
-            try {
-                dao.cadastrar(nomeLimpo, loginLimpo, senhaHash, salt)
-            } finally {
-                senhaHash.fill(0)
-            }
+        val salt = AuthManager.criarSalt()
+        val senhaHash = AuthManager.gerarHash(senha, salt)
+        try {
+            dao.cadastrar(nomeLimpo, loginLimpo, senhaHash, salt)
+        } finally {
+            senhaHash.fill(0)
         }
         true
     }
@@ -71,19 +69,17 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun entrar(login: String, senha: String) = executar {
         require(login.isNotBlank() && senha.isNotBlank()) { "Preencha usuário e senha." }
 
-        val usuario = withContext(Dispatchers.IO) {
-            val dados = dao.buscarSenha(login.trim())
-            // Mesmo sem usuário, confere um hash "vazio" para o tempo de resposta ser igual.
-            val senhaHash = dados?.hash ?: ByteArray(32)
-            val salt = dados?.salt ?: ByteArray(16)
-            val autenticado = try {
-                AuthManager.validarSenha(senha, salt, senhaHash)
-            } finally {
-                senhaHash.fill(0)
-            }
-            if (autenticado && dados != null) dao.buscarPorId(dados.usuarioId) else null
+        val dados = dao.buscarSenha(login.trim())
+        // Mesmo sem usuário, confere um hash "vazio" para o tempo de resposta ser igual.
+        val senhaHash = dados?.hash ?: ByteArray(32)
+        val salt = dados?.salt ?: ByteArray(16)
+        val autenticado = try {
+            AuthManager.validarSenha(senha, salt, senhaHash)
+        } finally {
+            senhaHash.fill(0)
         }
 
+        val usuario = if (autenticado && dados != null) dao.buscarPorId(dados.usuarioId) else null
         if (usuario != null) {
             SessaoUsuario.iniciar(usuario)
             true
