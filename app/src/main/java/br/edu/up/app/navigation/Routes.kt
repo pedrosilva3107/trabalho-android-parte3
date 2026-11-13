@@ -32,4 +32,18 @@ data object NovoUsuario
 data class EditarUsuario(val id: Long)
 
 @Serializable
+data object Categorias
+
+// id = 0 -> nova categoria; id > 0 -> editar a categoria
+@Serializable
+data class CategoriaForm(val id: Long = 0L)
+
+@Serializable
+data object Locais
+
+// id = 0 -> novo local; id > 0 -> editar o local
+@Serializable
+data class LocalForm(val id: Long = 0L)
+
+@Serializable
 data object Opcoes

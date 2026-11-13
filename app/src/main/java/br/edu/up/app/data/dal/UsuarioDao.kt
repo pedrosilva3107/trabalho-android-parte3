@@ -89,11 +89,17 @@ internal class UsuarioDao(context: Context) {
         }
     }
 
-    // Apaga primeiro as notas do usuário e depois o próprio usuário.
+    // Apaga primeiro as notas, categorias e locais do usuário e depois o próprio usuário.
     fun excluir(id: Long) {
         AppDatabase(appContext).use { db ->
             db.writableDatabase.delete(
                 "notas", "usuario_id = ?", arrayOf(id.toString())
+            )
+            db.writableDatabase.delete(
+                "categorias", "usuario_id = ?", arrayOf(id.toString())
+            )
+            db.writableDatabase.delete(
+                "locais", "usuario_id = ?", arrayOf(id.toString())
             )
             val excluidos = db.writableDatabase.delete(
                 "usuarios", "id = ?", arrayOf(id.toString())

@@ -2,7 +2,10 @@ package br.edu.up.app.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,7 +20,6 @@ import br.edu.up.app.ui.components.Aviso
 import br.edu.up.app.ui.components.BotaoSalvar
 import br.edu.up.app.ui.components.BotaoVoltar
 import br.edu.up.app.ui.components.CampoTexto
-import br.edu.up.app.ui.components.FaixaTopo
 import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.viewmodel.AuthViewModel
 
@@ -43,11 +45,13 @@ fun CadastroScreen(
         }
     }
 
+    // imePadding + verticalScroll: com o teclado aberto dá para rolar até o botão Salvar.
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
+            .verticalScroll(rememberScrollState())
     ) {
-        FaixaTopo()
         BotaoVoltar(onVoltar)
         TituloTela(titulo)
 

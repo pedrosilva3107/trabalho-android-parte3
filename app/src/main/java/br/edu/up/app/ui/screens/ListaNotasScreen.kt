@@ -53,32 +53,24 @@ fun ListaNotasScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // Título à esquerda e a quantidade de notas à direita.
+            // Saudação à esquerda e a quantidade de notas à direita.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                Column(
+                Text(
+                    text = "Olá, ${usuario.nome}",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 72.dp)
-                ) {
-                    Text(
-                        text = "Notas",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Olá, ${usuario.nome}",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 13.sp
-                    )
-                }
+                )
                 Text(
-                    text = "${notas.size} notas",
+                    text = if (notas.size == 1) "1 nota" else "${notas.size} notas",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp
                 )
@@ -106,6 +98,7 @@ fun ListaNotasScreen(
                         Row(modifier = Modifier.padding(horizontal = 20.dp)) {
                             CartaoNota(
                                 nota = notas[esquerda],
+                                categoria = notaViewModel.nomeCategoria(notas[esquerda].categoriaId),
                                 cor = corPostit,
                                 tamanhoFonte = tamanhoFonte,
                                 modifier = Modifier
@@ -116,6 +109,7 @@ fun ListaNotasScreen(
                             if (direita < notas.size) {
                                 CartaoNota(
                                     nota = notas[direita],
+                                    categoria = notaViewModel.nomeCategoria(notas[direita].categoriaId),
                                     cor = corPostit,
                                     tamanhoFonte = tamanhoFonte,
                                     modifier = Modifier
@@ -144,14 +138,16 @@ fun ListaNotasScreen(
 @Composable
 private fun CartaoNota(
     nota: Nota,
+    categoria: String,
     cor: Color,
     tamanhoFonte: Int,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     // Texto longo não cabe no post-it: mostra só o começo e "...".
-    // Quanto maior a fonte, menos letras cabem.
-    val limite = 16000 / (tamanhoFonte * tamanhoFonte)
+    // Quanto maior a fonte, menos letras cabem (e menos ainda se tiver categoria).
+    val espaco = if (categoria.isEmpty()) 16000 else 12000
+    val limite = espaco / (tamanhoFonte * tamanhoFonte)
     val texto = if (nota.texto.length > limite) nota.texto.take(limite).trim() + "..." else nota.texto
 
     PostitCard(
@@ -160,11 +156,23 @@ private fun CartaoNota(
             .height(150.dp)
             .clickable { onClick() }
     ) {
-        Text(
-            text = texto,
-            color = TextoPostit,
-            fontSize = tamanhoFonte.sp,
-            modifier = Modifier.padding(12.dp)
-        )
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (categoria.isNotEmpty()) {
+                Text(
+                    text = categoria.uppercase(),
+                    color = TextoPostit,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Text(
+                text = texto,
+                color = TextoPostit,
+                fontSize = tamanhoFonte.sp
+            )
+        }
     }
 }

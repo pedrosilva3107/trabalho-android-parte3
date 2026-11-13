@@ -13,10 +13,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import br.edu.up.app.auth.SessaoUsuario
 import br.edu.up.app.ui.screens.CadastroScreen
+import br.edu.up.app.ui.screens.CategoriaFormScreen
+import br.edu.up.app.ui.screens.CategoriasScreen
 import br.edu.up.app.ui.screens.CriarNotaScreen
 import br.edu.up.app.ui.screens.EditarNotaScreen
 import br.edu.up.app.ui.screens.EditarUsuarioScreen
 import br.edu.up.app.ui.screens.ListaNotasScreen
+import br.edu.up.app.ui.screens.LocaisScreen
+import br.edu.up.app.ui.screens.LocalFormScreen
 import br.edu.up.app.ui.screens.LoginScreen
 import br.edu.up.app.ui.screens.OpcoesScreen
 import br.edu.up.app.ui.screens.UsuariosScreen
@@ -152,6 +156,44 @@ fun AppNavigation(
                         navController.popBackStack()
                     }
                 }
+            )
+        }
+
+        composable<Categorias> {
+            CategoriasScreen(
+                categoriaViewModel = viewModel(),
+                corPostit = corPostit,
+                onNova = { navController.navigate(CategoriaForm()) },
+                onAbrir = { id -> navController.navigate(CategoriaForm(id)) }
+            )
+        }
+
+        composable<CategoriaForm> { entrada ->
+            val rota = entrada.toRoute<CategoriaForm>()
+            CategoriaFormScreen(
+                categoriaId = rota.id,
+                categoriaViewModel = viewModel(),
+                corPostit = corPostit,
+                onVoltar = { navController.popBackStack() }
+            )
+        }
+
+        composable<Locais> {
+            LocaisScreen(
+                localViewModel = viewModel(),
+                corPostit = corPostit,
+                onNovo = { navController.navigate(LocalForm()) },
+                onAbrir = { id -> navController.navigate(LocalForm(id)) }
+            )
+        }
+
+        composable<LocalForm> { entrada ->
+            val rota = entrada.toRoute<LocalForm>()
+            LocalFormScreen(
+                localId = rota.id,
+                localViewModel = viewModel(),
+                corPostit = corPostit,
+                onVoltar = { navController.popBackStack() }
             )
         }
 

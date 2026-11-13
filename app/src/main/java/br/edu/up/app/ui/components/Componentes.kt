@@ -9,22 +9,34 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.edu.up.app.data.model.Categoria
 import br.edu.up.app.ui.theme.FormatoPostit
 import br.edu.up.app.ui.theme.SombraDobra
 import br.edu.up.app.ui.theme.TextoPostit
@@ -43,19 +55,104 @@ fun FaixaTopo() {
 }
 
 @Composable
-fun TituloTela(texto: String, centralizado: Boolean = false) {
-    Column(
+fun TituloTela(texto: String) {
+    Text(
+        text = texto,
+        color = MaterialTheme.colorScheme.onBackground,
+        fontSize = 26.sp,
+        fontWeight = FontWeight.Bold,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(20.dp),
-        horizontalAlignment = if (centralizado) Alignment.CenterHorizontally else Alignment.Start
+            .padding(20.dp)
+    )
+}
+
+// Cartão post-it das listas (categorias e locais): título em negrito e um texto embaixo.
+@Composable
+fun CartaoLista(titulo: String, subtitulo: String, cor: Color, onClick: () -> Unit) {
+    PostitCard(
+        cor = cor,
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .clickable { onClick() }
     ) {
-        Text(
-            text = texto,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(text = titulo, color = TextoPostit, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            if (subtitulo.isNotBlank()) {
+                Text(text = subtitulo, color = TextoPostit, fontSize = 14.sp)
+            }
+        }
+    }
+}
+
+// Escolha da categoria da nota (mesmo dropdown do formulário feito em aula).
+// categoriaId = 0 -> "Sem categoria".
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SeletorCategoria(
+    categorias: List<Categoria>,
+    categoriaId: Long,
+    onEscolher: (Long) -> Unit,
+    corPostit: Color
+) {
+    var expandido by remember { mutableStateOf(false) }
+    val nomeEscolhido = categorias.find { it.id == categoriaId }?.nome ?: "Sem categoria"
+
+    ExposedDropdownMenuBox(
+        expanded = expandido,
+        onExpandedChange = { expandido = !expandido },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = nomeEscolhido,
+            onValueChange = {},
+            readOnly = true,
+            singleLine = true,
+            label = { Text("Categoria") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandido) },
+            shape = FormatoPostit,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = corPostit,
+                unfocusedContainerColor = corPostit,
+                focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedBorderColor = Color.Transparent,
+                focusedTextColor = TextoPostit,
+                unfocusedTextColor = TextoPostit,
+                focusedLabelColor = TextoPostit,
+                unfocusedLabelColor = TextoPostit,
+                focusedTrailingIconColor = TextoPostit,
+                unfocusedTrailingIconColor = TextoPostit
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable)
         )
+        ExposedDropdownMenu(
+            expanded = expandido,
+            onDismissRequest = { expandido = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Sem categoria") },
+                onClick = {
+                    onEscolher(0L)
+                    expandido = false
+                }
+            )
+            categorias.forEach { categoria ->
+                DropdownMenuItem(
+                    text = { Text(categoria.nome) },
+                    onClick = {
+                        onEscolher(categoria.id)
+                        expandido = false
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -194,7 +291,8 @@ fun CampoTexto(
     rotulo: String,
     corPostit: Color,
     modifier: Modifier = Modifier,
-    senha: Boolean = false
+    senha: Boolean = false,
+    numerico: Boolean = false
 ) {
     OutlinedTextField(
         value = valor,
@@ -202,6 +300,9 @@ fun CampoTexto(
         label = { Text(rotulo) },
         singleLine = true,
         visualTransformation = if (senha) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = if (numerico) KeyboardType.Number else KeyboardType.Text
+        ),
         shape = FormatoPostit,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = corPostit,

@@ -18,12 +18,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
-import br.edu.up.app.ui.components.FaixaTopo
 import br.edu.up.app.ui.components.PostitCard
-import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.theme.CORES_POSTIT
 import br.edu.up.app.ui.theme.TextoPostit
 import br.edu.up.app.ui.viewmodel.OpcoesViewModel
@@ -39,9 +37,6 @@ fun OpcoesScreen(opcoesViewModel: OpcoesViewModel) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        FaixaTopo()
-        TituloTela("Opções", centralizado = true)
-
         Column(
             modifier = Modifier
                 .fillMaxSize()

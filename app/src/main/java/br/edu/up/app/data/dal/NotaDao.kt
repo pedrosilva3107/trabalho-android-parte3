@@ -10,11 +10,12 @@ import br.edu.up.app.data.model.Nota
 internal class NotaDao(context: Context) {
     private val appContext = context.applicationContext
 
-    fun inserir(usuarioId: Long, texto: String): Long {
+    fun inserir(usuarioId: Long, texto: String, categoriaId: Long): Long {
         return AppDatabase(appContext).use { db ->
             val dados = ContentValues().apply {
                 put("usuario_id", usuarioId)
                 put("texto", texto)
+                put("categoria_id", categoriaId)
             }
             db.writableDatabase.insertOrThrow("notas", null, dados)
         }
@@ -23,7 +24,7 @@ internal class NotaDao(context: Context) {
     fun listarPorUsuario(usuarioId: Long): List<Nota> = AppDatabase(appContext).use { db ->
         db.readableDatabase.query(
             "notas",
-            arrayOf("id", "usuario_id", "texto"),
+            arrayOf("id", "usuario_id", "texto", "categoria_id"),
             "usuario_id = ?",
             arrayOf(usuarioId.toString()),
             null, null,
@@ -31,7 +32,7 @@ internal class NotaDao(context: Context) {
         ).use { cursor ->
             buildList {
                 while (cursor.moveToNext()) {
-                    add(Nota(cursor.getLong(0), cursor.getLong(1), cursor.getString(2)))
+                    add(Nota(cursor.getLong(0), cursor.getLong(1), cursor.getString(2), cursor.getLong(3)))
                 }
             }
         }
@@ -40,20 +41,23 @@ internal class NotaDao(context: Context) {
     fun buscarPorId(id: Long, usuarioId: Long): Nota? = AppDatabase(appContext).use { db ->
         db.readableDatabase.query(
             "notas",
-            arrayOf("id", "usuario_id", "texto"),
+            arrayOf("id", "usuario_id", "texto", "categoria_id"),
             "id = ? AND usuario_id = ?",
             arrayOf(id.toString(), usuarioId.toString()),
             null, null, null
         ).use { cursor ->
             if (cursor.moveToFirst()) {
-                Nota(cursor.getLong(0), cursor.getLong(1), cursor.getString(2))
+                Nota(cursor.getLong(0), cursor.getLong(1), cursor.getString(2), cursor.getLong(3))
             } else null
         }
     }
 
-    fun alterar(id: Long, usuarioId: Long, texto: String) {
+    fun alterar(id: Long, usuarioId: Long, texto: String, categoriaId: Long) {
         AppDatabase(appContext).use { db ->
-            val dados = ContentValues().apply { put("texto", texto) }
+            val dados = ContentValues().apply {
+                put("texto", texto)
+                put("categoria_id", categoriaId)
+            }
             val alterados = db.writableDatabase.update(
                 "notas", dados,
                 "id = ? AND usuario_id = ?",

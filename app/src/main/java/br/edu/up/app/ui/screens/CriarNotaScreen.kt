@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -15,7 +18,7 @@ import br.edu.up.app.ui.components.Aviso
 import br.edu.up.app.ui.components.BotaoSalvar
 import br.edu.up.app.ui.components.BotaoVoltar
 import br.edu.up.app.ui.components.CampoNota
-import br.edu.up.app.ui.components.FaixaTopo
+import br.edu.up.app.ui.components.SeletorCategoria
 import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.viewmodel.NotaViewModel
 
@@ -27,6 +30,8 @@ fun CriarNotaScreen(
     tamanhoFonte: Int,
     onVoltar: () -> Unit
 ) {
+    // Carrega as categorias para o campo de escolha.
+    LaunchedEffect(Unit) { notaViewModel.carregarCategorias() }
     LaunchedEffect(notaViewModel.salvo) {
         if (notaViewModel.salvo) {
             notaViewModel.consumirSalvo()
@@ -34,11 +39,13 @@ fun CriarNotaScreen(
         }
     }
 
+    // imePadding + verticalScroll: com o teclado aberto dá para rolar até o botão Salvar.
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
+            .verticalScroll(rememberScrollState())
     ) {
-        FaixaTopo()
         BotaoVoltar(onVoltar)
         TituloTela("Criar nota")
 
@@ -48,6 +55,13 @@ fun CriarNotaScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            SeletorCategoria(
+                categorias = notaViewModel.categorias,
+                categoriaId = notaViewModel.categoriaId,
+                onEscolher = notaViewModel::mudarCategoria,
+                corPostit = corPostit
+            )
+
             CampoNota(
                 texto = notaViewModel.texto,
                 onTextoChange = notaViewModel::mudarTexto,

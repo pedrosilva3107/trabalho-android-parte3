@@ -3,6 +3,7 @@ package br.edu.up.app.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import br.edu.up.app.ui.components.Aviso
 import br.edu.up.app.ui.components.BotaoSalvar
 import br.edu.up.app.ui.components.CampoTexto
-import br.edu.up.app.ui.components.FaixaTopo
 import br.edu.up.app.ui.viewmodel.AuthViewModel
 
 @Composable
@@ -47,9 +47,8 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
     ) {
-        FaixaTopo()
-
         Column(
             modifier = Modifier
                 .fillMaxSize()

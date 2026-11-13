@@ -22,6 +22,19 @@ object CadastroValidator {
         require(texto.isNotBlank()) { "Escreva algo antes de salvar." }
     }
 
+    fun validarCategoria(nome: String) {
+        require(nome.isNotBlank()) { "Informe o nome da categoria." }
+    }
+
+    fun validarLocal(nome: String, cep: String, endereco: String) {
+        require(nome.isNotBlank()) { "Informe o nome do local." }
+        require(cepValido(cep)) { "Informe um CEP válido (ex.: 80010-000)." }
+        require(endereco.isNotBlank()) { "Busque o CEP ou escreva o endereço." }
+    }
+
+    // CEP com 8 números, com ou sem traço.
+    fun cepValido(cep: String): Boolean = Regex("[0-9]{5}-?[0-9]{3}").matches(cep)
+
     private fun validarSenha(senha: String) {
         require(senha.length >= 4) { "A senha precisa ter pelo menos 4 caracteres." }
     }

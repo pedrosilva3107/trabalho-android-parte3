@@ -50,26 +50,13 @@ fun UsuariosScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // Título à esquerda e a quantidade de usuários à direita.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Text(
-                    text = "Usuários",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "${usuarios.size} cadastrados",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 13.sp
-                )
-            }
+            // Quantidade de usuários (o título "Usuários" fica na barra do topo).
+            Text(
+                text = if (usuarios.size == 1) "1 cadastrado" else "${usuarios.size} cadastrados",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(20.dp)
+            )
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)

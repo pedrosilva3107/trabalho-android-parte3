@@ -1,33 +1,43 @@
 package br.edu.up.app.navigation
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import br.edu.up.app.auth.SessaoUsuario
 import br.edu.up.app.ui.components.FaixaTopo
+import br.edu.up.app.ui.viewmodel.OpcoesViewModel
+import kotlinx.coroutines.launch
 
-// Altura total do menu (faixa roxa de 4dp + 48dp dos botões).
-// A MainActivity deixa esse espaço livre embaixo das telas.
-val ALTURA_MENU = 52.dp
-
-// Menu inferior. Só aparece com usuário logado (nunca no login/cadastro).
+// Menu lateral (gaveta) + barra do topo com o botão ☰.
+// O menu só aparece com usuário logado (nunca no login/cadastro).
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Menu(navController: NavHostController) {
+fun Menu(opcoesViewModel: OpcoesViewModel) {
+    val navController = rememberNavController()
     val entradaAtual by navController.currentBackStackEntryAsState()
     val destino = entradaAtual?.destination
 
@@ -40,6 +50,16 @@ fun Menu(navController: NavHostController) {
                     (destino?.hasRoute<EditarNota>() ?: false)
         ),
         Triple(
+            "Categorias", Categorias,
+            (destino?.hasRoute<Categorias>() ?: false) ||
+                    (destino?.hasRoute<CategoriaForm>() ?: false)
+        ),
+        Triple(
+            "Locais", Locais,
+            (destino?.hasRoute<Locais>() ?: false) ||
+                    (destino?.hasRoute<LocalForm>() ?: false)
+        ),
+        Triple(
             "Usuários", Usuarios,
             (destino?.hasRoute<Usuarios>() ?: false) ||
                     (destino?.hasRoute<NovoUsuario>() ?: false) ||
@@ -47,64 +67,104 @@ fun Menu(navController: NavHostController) {
         ),
         Triple("Opções", Opcoes, destino?.hasRoute<Opcoes>() ?: false)
     )
+    val titulo = itens.firstOrNull { it.third }?.first ?: "Notas"
 
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(ALTURA_MENU),
-        color = MaterialTheme.colorScheme.surface
-    ) {
-        Column {
-            FaixaTopo()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                verticalAlignment = Alignment.CenterVertically
+    // Login e Cadastro são as telas públicas: nelas o menu não aparece.
+    val telaPublica = (destino?.hasRoute<Login>() ?: false) ||
+            (destino?.hasRoute<Cadastro>() ?: false)
+    val mostrarMenu = SessaoUsuario.usuario != null && destino != null && !telaPublica
+
+    val menu = rememberDrawerState(DrawerValue.Closed)
+    val escopo = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = menu,
+        gesturesEnabled = mostrarMenu,
+        drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier.width(250.dp),
+                drawerContainerColor = MaterialTheme.colorScheme.background
             ) {
-                // 4 abas do mesmo tamanho: cada uma ocupa uma parte do espaço que sobra
-                // (1/4 da linha, 1/3 do resto, 1/2 do resto e o resto todo).
-                itens.forEachIndexed { i, (nome, rota, selecionado) ->
-                    ItemMenu(
-                        texto = nome,
-                        selecionado = selecionado,
-                        modifier = Modifier.fillMaxWidth(1f / (4 - i)),
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(
+                        text = "Menu",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    itens.forEach { (nome, rota, selecionado) ->
+                        NavigationDrawerItem(
+                            label = { Text(nome, color = MaterialTheme.colorScheme.onBackground) },
+                            selected = selecionado,
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            onClick = {
+                                escopo.launch {
+                                    menu.close()
+                                    if (!selecionado) {
+                                        // A lista de notas fica sempre na base da pilha.
+                                        navController.navigate(rota) {
+                                            popUpTo<ListaNotas>()
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+                    NavigationDrawerItem(
+                        label = { Text("Sair", color = MaterialTheme.colorScheme.onBackground) },
+                        selected = false,
+                        modifier = Modifier.padding(horizontal = 8.dp),
                         onClick = {
-                            // Troca de aba sem empilhar telas: a lista de notas fica sempre na base da pilha.
-                            navController.navigate(rota) {
-                                popUpTo<ListaNotas>()
-                                launchSingleTop = true
+                            escopo.launch {
+                                menu.close()
+                                SessaoUsuario.encerrar()
+                                navController.irParaLogin()
                             }
                         }
                     )
                 }
-                ItemMenu(
-                    texto = "Sair",
-                    selecionado = false,
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        SessaoUsuario.encerrar()
-                        navController.irParaLogin()
-                    }
-                )
             }
+        }
+    ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                if (mostrarMenu) {
+                    Column {
+                        TopAppBar(
+                            title = { Text(titulo) },
+                            navigationIcon = {
+                                BotaoMenu { escopo.launch { menu.open() } }
+                            }
+                        )
+                        FaixaTopo()
+                    }
+                } else {
+                    // Login e Cadastro: só a faixa roxa, abaixo da barra de status.
+                    Column(modifier = Modifier.statusBarsPadding()) {
+                        FaixaTopo()
+                    }
+                }
+            }
+        ) { innerPadding ->
+            AppNavigation(
+                navController = navController,
+                opcoesViewModel = opcoesViewModel,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+            )
         }
     }
 }
 
 @Composable
-private fun ItemMenu(
-    texto: String,
-    selecionado: Boolean,
-    modifier: Modifier,
-    onClick: () -> Unit
-) {
-    TextButton(onClick = onClick, modifier = modifier) {
+private fun BotaoMenu(abrirMenu: () -> Unit) {
+    IconButton(onClick = abrirMenu) {
         Text(
-            text = texto,
-            color = if (selecionado) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
-            fontWeight = if (selecionado) FontWeight.Bold else FontWeight.Normal,
-            fontSize = 14.sp
+            text = "☰",
+            fontSize = 24.sp
         )
     }
 }
