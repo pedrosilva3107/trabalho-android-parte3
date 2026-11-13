@@ -17,13 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// CRUD dos locais do usuário logado + consulta de CEP na API ViaCEP (Retrofit).
 class LocalViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = LocalDao(application)
 
     var locais by mutableStateOf<List<Local>>(emptyList())
         private set
-    // null = local novo (tela em modo "criar")
     var local by mutableStateOf<Local?>(null)
         private set
     var nome by mutableStateOf("")
@@ -39,8 +37,6 @@ class LocalViewModel(application: Application) : AndroidViewModel(application) {
     var mensagem by mutableStateOf<String?>(null)
         private set
 
-    // Roda a operação em segundo plano (Dispatchers.IO).
-    // A operação recebe o id de quem está logado (sem sessão, não roda).
     private fun executar(op: (usuarioId: Long) -> Unit) {
         if (carregando || salvo) return
         carregando = true
@@ -94,7 +90,6 @@ class LocalViewModel(application: Application) : AndroidViewModel(application) {
         mensagem = null
     }
 
-    // Consulta o CEP na API ViaCEP e preenche o endereço.
     fun buscarCep() {
         if (carregando) return
         mensagem = null
@@ -123,7 +118,6 @@ class LocalViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Ex.: "Praça Tiradentes, Centro, Curitiba - PR". Partes vazias ficam de fora.
     private fun montarEndereco(resposta: Endereco): String {
         var texto = ""
         if (!resposta.rua.isNullOrBlank()) texto += resposta.rua + ", "
@@ -132,7 +126,6 @@ class LocalViewModel(application: Application) : AndroidViewModel(application) {
         return texto
     }
 
-    // Sem local selecionado cria um novo; com local selecionado altera.
     fun salvar() = executar { usuarioId ->
         val nomeLimpo = nome.trim()
         val cepLimpo = cep.trim()

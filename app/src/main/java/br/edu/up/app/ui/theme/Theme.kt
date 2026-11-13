@@ -5,12 +5,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-// Onde cada cor é usada nas telas:
-//   background       → fundo creme das telas
-//   onBackground     → títulos e textos
-//   onSurfaceVariant → textos secundários ("4 notas", "Olá, ...")
-//   primary          → roxo (faixa do topo, erros, item do menu selecionado)
-//   surface          → botão "✓ Salvar" e menu inferior
 private val LightColorScheme = lightColorScheme(
     primary = Roxo,
     background = Creme,
@@ -29,7 +23,6 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = TextoFracoEscuro
 )
 
-// O modo escuro vem da tela de Opções (não do sistema), por isso começa desligado.
 @Composable
 fun NotasAppTheme(
     darkTheme: Boolean = false,

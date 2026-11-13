@@ -27,7 +27,6 @@ import br.edu.up.app.ui.screens.UsuariosScreen
 import br.edu.up.app.ui.theme.CORES_POSTIT
 import br.edu.up.app.ui.viewmodel.OpcoesViewModel
 
-// Sai de qualquer tela e volta ao login, limpando a pilha (o "voltar" não retorna ao app).
 fun NavHostController.irParaLogin(mensagem: String = "") {
     navigate(Login(mensagem)) {
         popUpTo(graph.id) { inclusive = true }
@@ -47,9 +46,6 @@ fun AppNavigation(
     val corPostit = CORES_POSTIT[opcoesViewModel.corPostitIndex]
     val tamanhoFonte = opcoesViewModel.tamanhoFonte
 
-    // Controle de sessão: se a tela atual exige login e ninguém está logado,
-    // manda para o Login. Roda de novo a cada troca de tela ou de sessão.
-    // Login e Cadastro são as únicas telas que abrem sem sessão.
     LaunchedEffect(entradaAtual, usuarioLogado) {
         val destino = entradaAtual?.destination ?: return@LaunchedEffect
         val telaPublica = destino.hasRoute<Login>() || destino.hasRoute<Cadastro>()
@@ -63,7 +59,6 @@ fun AppNavigation(
         startDestination = Login(),
         modifier = modifier
     ) {
-
         composable<Login> { entrada ->
             val rota = entrada.toRoute<Login>()
             LoginScreen(
@@ -149,7 +144,6 @@ fun AppNavigation(
                 onVoltar = { navController.popBackStack() },
                 onExcluiu = { excluiuPropriaConta ->
                     if (excluiuPropriaConta) {
-                        // Apagou a própria conta: encerra a sessão e volta ao login.
                         SessaoUsuario.encerrar()
                         navController.irParaLogin("Conta excluída.")
                     } else {

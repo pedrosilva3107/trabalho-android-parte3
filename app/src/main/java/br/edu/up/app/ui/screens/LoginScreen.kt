@@ -36,7 +36,6 @@ fun LoginScreen(
     var usuario by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf("") }
 
-    // Quando o login dá certo, o ViewModel marca "concluido" e a tela navega.
     LaunchedEffect(authViewModel.concluido) {
         if (authViewModel.concluido) {
             authViewModel.consumirResultado()
@@ -85,7 +84,6 @@ fun LoginScreen(
                 modifier = Modifier.padding(top = 14.dp)
             )
 
-            // Erro do login tem prioridade sobre o aviso que veio da navegação.
             Aviso(
                 texto = authViewModel.mensagem ?: mensagem,
                 modifier = Modifier.padding(top = 10.dp)

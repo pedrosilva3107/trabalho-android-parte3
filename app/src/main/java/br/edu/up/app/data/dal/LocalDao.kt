@@ -5,7 +5,6 @@ import android.content.Context
 import br.edu.up.app.data.local.AppDatabase
 import br.edu.up.app.data.model.Local
 
-// CRUD da tabela "locais". Toda consulta filtra pelo usuario_id.
 internal class LocalDao(context: Context) {
     private val appContext = context.applicationContext
 

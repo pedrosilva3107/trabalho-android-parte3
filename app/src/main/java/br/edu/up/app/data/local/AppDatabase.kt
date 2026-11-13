@@ -5,15 +5,12 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import java.io.File
 
-// Banco SQLite do app. Só cria as tabelas: os dados entram pelas telas, nunca por aqui.
-// Notas, categorias e locais têm usuario_id: cada usuário só vê os próprios dados.
 internal class AppDatabase(context: Context) : SQLiteOpenHelper(
     context.applicationContext,
     File(context.noBackupFilesDir, NOME_BANCO).absolutePath,
     null,
     VERSAO
 ) {
-
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             """
@@ -26,7 +23,6 @@ internal class AppDatabase(context: Context) : SQLiteOpenHelper(
             )
             """.trimIndent()
         )
-        // categoria_id = 0 quando a nota não tem categoria.
         db.execSQL(
             """
             CREATE TABLE notas(
@@ -41,8 +37,6 @@ internal class AppDatabase(context: Context) : SQLiteOpenHelper(
         criarLocais(db)
     }
 
-    // Versão 1 tinha só usuarios e notas. A versão 2 cria categorias e locais
-    // e adiciona a categoria nas notas, sem apagar o que já estava salvo.
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 2) {
             db.execSQL("ALTER TABLE notas ADD COLUMN categoria_id INTEGER NOT NULL DEFAULT 0")

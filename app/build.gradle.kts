@@ -53,11 +53,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    // Navegação com rotas tipadas (@Serializable)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
-    // API (ViaCEP) com Retrofit + Gson
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
 }

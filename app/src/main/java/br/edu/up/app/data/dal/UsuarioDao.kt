@@ -5,10 +5,8 @@ import android.content.Context
 import br.edu.up.app.data.local.AppDatabase
 import br.edu.up.app.data.model.Usuario
 
-// Hash e salt da senha de um usuário (usado só no login).
 internal class SenhaSalva(val hash: ByteArray, val salt: ByteArray, val usuarioId: Long)
 
-// CRUD da tabela "usuarios".
 internal class UsuarioDao(context: Context) {
     private val appContext = context.applicationContext
 
@@ -67,7 +65,6 @@ internal class UsuarioDao(context: Context) {
         }
     }
 
-    // hash e salt nulos = mantém a senha atual.
     fun alterar(
         id: Long,
         nome: String,
@@ -89,7 +86,6 @@ internal class UsuarioDao(context: Context) {
         }
     }
 
-    // Apaga primeiro as notas, categorias e locais do usuário e depois o próprio usuário.
     fun excluir(id: Long) {
         AppDatabase(appContext).use { db ->
             db.writableDatabase.delete(

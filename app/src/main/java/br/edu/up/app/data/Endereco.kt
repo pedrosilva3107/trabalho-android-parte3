@@ -2,7 +2,6 @@ package br.edu.up.app.data
 
 import com.google.gson.annotations.SerializedName
 
-// Resposta da API ViaCEP (https://viacep.com.br/ws/{cep}/json/).
 data class Endereco(
     @SerializedName("cep") val cep: String? = null,
     @SerializedName("logradouro") val rua: String? = null,

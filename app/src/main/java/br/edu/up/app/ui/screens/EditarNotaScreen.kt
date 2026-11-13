@@ -25,7 +25,6 @@ import br.edu.up.app.ui.components.SeletorCategoria
 import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.viewmodel.NotaViewModel
 
-// Update e Delete do CRUD de notas. Recebe o id pela rota EditarNota(id).
 @Composable
 fun EditarNotaScreen(
     notaId: Long,
@@ -42,7 +41,6 @@ fun EditarNotaScreen(
         }
     }
 
-    // imePadding + verticalScroll: com o teclado aberto dá para rolar até o botão Salvar.
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -17,21 +17,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// CRUD das notas do usuário logado.
 class NotaViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = NotaDao(application)
     private val categoriaDao = CategoriaDao(application)
 
     var notas by mutableStateOf<List<Nota>>(emptyList())
         private set
-    // Categorias do usuário: aparecem no cartão da nota e na escolha da categoria.
     var categorias by mutableStateOf<List<Categoria>>(emptyList())
         private set
     var nota by mutableStateOf<Nota?>(null)
         private set
     var texto by mutableStateOf("")
         private set
-    // 0 = sem categoria
     var categoriaId by mutableStateOf(0L)
         private set
     var carregando by mutableStateOf(false)
@@ -41,8 +38,6 @@ class NotaViewModel(application: Application) : AndroidViewModel(application) {
     var mensagem by mutableStateOf<String?>(null)
         private set
 
-    // Roda a operação em segundo plano (Dispatchers.IO).
-    // A operação recebe o id de quem está logado (sem sessão, não roda).
     private fun executar(op: (usuarioId: Long) -> Unit) {
         if (carregando || salvo) return
         carregando = true
@@ -69,7 +64,6 @@ class NotaViewModel(application: Application) : AndroidViewModel(application) {
         categorias = categoriaDao.listarPorUsuario(usuarioId)
     }
 
-    // Tela "Criar nota": só precisa das categorias para o campo de escolha.
     fun carregarCategorias() = executar { usuarioId ->
         categorias = categoriaDao.listarPorUsuario(usuarioId)
     }
@@ -86,7 +80,6 @@ class NotaViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Nome da categoria da nota ("" se não tiver).
     fun nomeCategoria(id: Long): String = categorias.find { it.id == id }?.nome ?: ""
 
     fun mudarTexto(valor: String) {

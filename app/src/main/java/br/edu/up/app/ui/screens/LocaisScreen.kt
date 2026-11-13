@@ -22,7 +22,6 @@ import br.edu.up.app.ui.components.BotaoAdicionar
 import br.edu.up.app.ui.components.CartaoLista
 import br.edu.up.app.ui.viewmodel.LocalViewModel
 
-// Read do CRUD de locais.
 @Composable
 fun LocaisScreen(
     localViewModel: LocalViewModel,
@@ -30,14 +29,12 @@ fun LocaisScreen(
     onNovo: () -> Unit,
     onAbrir: (Long) -> Unit
 ) {
-    // Busca os locais no banco ao abrir a tela.
     LaunchedEffect(Unit) {
         localViewModel.listar()
     }
 
     val locais = localViewModel.locais
 
-    // contentAlignment = BottomEnd deixa o botão + no canto de baixo à direita.
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
@@ -70,7 +67,6 @@ fun LocaisScreen(
                     )
                 }
 
-                // Espaço no fim da lista para o último cartão não ficar embaixo do botão +.
                 item { Spacer(modifier = Modifier.height(88.dp)) }
             }
         }

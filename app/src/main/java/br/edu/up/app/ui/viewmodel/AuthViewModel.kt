@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// Login e cadastro (telas públicas, sem sessão).
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = UsuarioDao(application)
 
@@ -27,7 +26,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     var mensagem by mutableStateOf<String?>(null)
         private set
 
-    // Roda a operação em segundo plano (Dispatchers.IO) e transforma os erros em mensagem.
     private fun executar(op: () -> Boolean) {
         if (carregando || concluido) return
         carregando = true
@@ -70,7 +68,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         require(login.isNotBlank() && senha.isNotBlank()) { "Preencha usuário e senha." }
 
         val dados = dao.buscarSenha(login.trim())
-        // Mesmo sem usuário, confere um hash "vazio" para o tempo de resposta ser igual.
         val senhaHash = dados?.hash ?: ByteArray(32)
         val salt = dados?.salt ?: ByteArray(16)
         val autenticado = try {

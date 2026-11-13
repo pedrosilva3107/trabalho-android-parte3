@@ -23,8 +23,6 @@ import br.edu.up.app.ui.components.CampoTexto
 import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.viewmodel.AuthViewModel
 
-// Create do CRUD de usuários. Usada no "Criar conta" (sem login)
-// e no "Novo usuário" (dentro do app).
 @Composable
 fun CadastroScreen(
     authViewModel: AuthViewModel,
@@ -45,7 +43,6 @@ fun CadastroScreen(
         }
     }
 
-    // imePadding + verticalScroll: com o teclado aberto dá para rolar até o botão Salvar.
     Column(
         modifier = Modifier
             .fillMaxSize()

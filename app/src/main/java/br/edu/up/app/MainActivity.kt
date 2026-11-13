@@ -14,7 +14,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            // Criado aqui (fora do NavHost) para valer no app inteiro.
             val opcoesViewModel: OpcoesViewModel = viewModel()
 
             NotasAppTheme(darkTheme = opcoesViewModel.modoEscuro) {

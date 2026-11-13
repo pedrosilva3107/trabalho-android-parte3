@@ -32,9 +32,6 @@ import br.edu.up.app.ui.components.CampoTexto
 import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.viewmodel.LocalViewModel
 
-// Create, Update e Delete do CRUD de locais.
-// Recebe o id pela rota LocalForm(id): 0 = novo local.
-// O endereço vem da API ViaCEP (Retrofit) e o botão "Abrir no mapa" usa o app de mapas do celular.
 @Composable
 fun LocalFormScreen(
     localId: Long,
@@ -111,7 +108,6 @@ fun LocalFormScreen(
                 }
             }
 
-            // Abre o endereço no app de mapas do celular.
             if (localViewModel.endereco.isNotBlank()) {
                 TextButton(
                     onClick = {
@@ -130,7 +126,6 @@ fun LocalFormScreen(
             }
 
             if (editando) {
-                // Primeiro toque pede confirmação; o segundo exclui.
                 TextButton(
                     onClick = {
                         if (confirmarExclusao) {

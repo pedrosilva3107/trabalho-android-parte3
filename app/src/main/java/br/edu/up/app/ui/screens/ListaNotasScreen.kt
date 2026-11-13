@@ -29,7 +29,6 @@ import br.edu.up.app.ui.components.PostitCard
 import br.edu.up.app.ui.theme.TextoPostit
 import br.edu.up.app.ui.viewmodel.NotaViewModel
 
-// Read do CRUD de notas.
 @Composable
 fun ListaNotasScreen(
     notaViewModel: NotaViewModel,
@@ -39,21 +38,17 @@ fun ListaNotasScreen(
     onCriar: () -> Unit,
     onAbrir: (Long) -> Unit
 ) {
-    // Busca as notas no banco ao abrir a tela (e de novo se o usuário mudar).
     LaunchedEffect(usuario.id) {
         notaViewModel.listar()
     }
 
     val notas = notaViewModel.notas
 
-    // contentAlignment = BottomEnd deixa o botão + no canto de baixo à direita.
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-
-            // Saudação à esquerda e a quantidade de notas à direita.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -83,7 +78,6 @@ fun ListaNotasScreen(
                     modifier = Modifier.padding(horizontal = 20.dp)
                 )
             } else {
-                // Grade de 2 colunas: cada linha da lista mostra 2 notas.
                 val linhas = List((notas.size + 1) / 2) { indice -> indice }
 
                 LazyColumn(
@@ -93,8 +87,6 @@ fun ListaNotasScreen(
                         val esquerda = linha * 2
                         val direita = esquerda + 1
 
-                        // Cada post-it ocupa metade da linha; os 8dp de cada lado
-                        // formam o espaço de 16dp entre os dois.
                         Row(modifier = Modifier.padding(horizontal = 20.dp)) {
                             CartaoNota(
                                 nota = notas[esquerda],
@@ -121,7 +113,6 @@ fun ListaNotasScreen(
                         }
                     }
 
-                    // Espaço no fim da lista para o último post-it não ficar embaixo do botão +.
                     item { Spacer(modifier = Modifier.height(84.dp)) }
                 }
             }
@@ -144,8 +135,6 @@ private fun CartaoNota(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    // Texto longo não cabe no post-it: mostra só o começo e "...".
-    // Quanto maior a fonte, menos letras cabem (e menos ainda se tiver categoria).
     val espaco = if (categoria.isEmpty()) 16000 else 12000
     val limite = espaco / (tamanhoFonte * tamanhoFonte)
     val texto = if (nota.texto.length > limite) nota.texto.take(limite).trim() + "..." else nota.texto

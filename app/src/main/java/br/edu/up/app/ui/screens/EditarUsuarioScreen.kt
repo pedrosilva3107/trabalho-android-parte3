@@ -26,7 +26,6 @@ import br.edu.up.app.ui.components.CampoTexto
 import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.viewmodel.UsuarioViewModel
 
-// Update e Delete do CRUD de usuários. Recebe o id pela rota EditarUsuario(id).
 @Composable
 fun EditarUsuarioScreen(
     usuarioId: Long,
@@ -52,7 +51,6 @@ fun EditarUsuarioScreen(
     var novaSenha by remember { mutableStateOf("") }
     var confirmarExclusao by remember { mutableStateOf(false) }
 
-    // imePadding + verticalScroll: com o teclado aberto dá para rolar até o botão Salvar.
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -98,7 +96,6 @@ fun EditarUsuarioScreen(
                 }
             }
 
-            // Primeiro toque pede confirmação; o segundo exclui.
             TextButton(
                 onClick = {
                     if (confirmarExclusao) {

@@ -5,8 +5,6 @@ import android.content.Context
 import br.edu.up.app.data.local.AppDatabase
 import br.edu.up.app.data.model.Nota
 
-// CRUD da tabela "notas". Toda consulta filtra pelo usuario_id,
-// então um usuário nunca lê nem altera a nota de outro.
 internal class NotaDao(context: Context) {
     private val appContext = context.applicationContext
 

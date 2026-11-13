@@ -22,7 +22,6 @@ import br.edu.up.app.ui.components.SeletorCategoria
 import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.viewmodel.NotaViewModel
 
-// Create do CRUD de notas.
 @Composable
 fun CriarNotaScreen(
     notaViewModel: NotaViewModel,
@@ -30,7 +29,6 @@ fun CriarNotaScreen(
     tamanhoFonte: Int,
     onVoltar: () -> Unit
 ) {
-    // Carrega as categorias para o campo de escolha.
     LaunchedEffect(Unit) { notaViewModel.carregarCategorias() }
     LaunchedEffect(notaViewModel.salvo) {
         if (notaViewModel.salvo) {
@@ -39,7 +37,6 @@ fun CriarNotaScreen(
         }
     }
 
-    // imePadding + verticalScroll: com o teclado aberto dá para rolar até o botão Salvar.
     Column(
         modifier = Modifier
             .fillMaxSize()

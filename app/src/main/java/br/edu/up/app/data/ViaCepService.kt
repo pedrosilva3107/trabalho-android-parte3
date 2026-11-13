@@ -5,7 +5,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-// Consulta de CEP com Retrofit.
 interface ViaCepService {
     @GET("{cep}/json/")
     suspend fun buscar(@Path("cep") cep: String): Endereco

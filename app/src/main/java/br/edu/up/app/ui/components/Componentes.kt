@@ -41,9 +41,6 @@ import br.edu.up.app.ui.theme.FormatoPostit
 import br.edu.up.app.ui.theme.SombraDobra
 import br.edu.up.app.ui.theme.TextoPostit
 
-// Componentes reaproveitados em várias telas.
-
-// Faixa roxa fina no topo das telas.
 @Composable
 fun FaixaTopo() {
     Surface(
@@ -67,7 +64,6 @@ fun TituloTela(texto: String) {
     )
 }
 
-// Cartão post-it das listas (categorias e locais): título em negrito e um texto embaixo.
 @Composable
 fun CartaoLista(titulo: String, subtitulo: String, cor: Color, onClick: () -> Unit) {
     PostitCard(
@@ -90,8 +86,6 @@ fun CartaoLista(titulo: String, subtitulo: String, cor: Color, onClick: () -> Un
     }
 }
 
-// Escolha da categoria da nota (mesmo dropdown do formulário feito em aula).
-// categoriaId = 0 -> "Sem categoria".
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeletorCategoria(
@@ -156,8 +150,6 @@ fun SeletorCategoria(
     }
 }
 
-// Cartão no estilo post-it: papel colorido com sombra e a "dobra" no canto
-// inferior direito. O conteúdo fica centralizado no cartão.
 @Composable
 fun PostitCard(
     cor: Color,
@@ -177,7 +169,6 @@ fun PostitCard(
             ) {
                 conteudo()
             }
-            // Dobra do papel
             Surface(
                 modifier = Modifier.size(20.dp),
                 shape = RoundedCornerShape(topStart = 14.dp),
@@ -187,7 +178,6 @@ fun PostitCard(
     }
 }
 
-// Botão "✓ Salvar": cartão creme com sombra; o toque fica no texto (clickable).
 @Composable
 fun BotaoSalvar(texto: String, onClick: () -> Unit) {
     Surface(
@@ -208,7 +198,6 @@ fun BotaoSalvar(texto: String, onClick: () -> Unit) {
     }
 }
 
-// Botão "+" no canto da tela, na cor do post-it (Criar nota / Novo usuário).
 @Composable
 fun BotaoAdicionar(cor: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
@@ -235,7 +224,6 @@ fun BotaoVoltar(onClick: () -> Unit) {
     }
 }
 
-// Mensagem de erro/aviso em roxo, embaixo dos formulários.
 @Composable
 fun Aviso(texto: String?, modifier: Modifier = Modifier) {
     if (!texto.isNullOrBlank()) {
@@ -248,7 +236,6 @@ fun Aviso(texto: String?, modifier: Modifier = Modifier) {
     }
 }
 
-// Post-it grande onde se escreve a nota (telas Criar e Editar).
 @Composable
 fun CampoNota(
     texto: String,
@@ -263,7 +250,6 @@ fun CampoNota(
             .fillMaxWidth()
             .height(240.dp)
     ) {
-        // Campo sem borda e sem fundo: quem aparece é o papel do post-it.
         OutlinedTextField(
             value = texto,
             onValueChange = onTextoChange,
@@ -283,7 +269,6 @@ fun CampoNota(
     }
 }
 
-// Campo de formulário no estilo post-it (login, cadastro e edição de usuário).
 @Composable
 fun CampoTexto(
     valor: String,

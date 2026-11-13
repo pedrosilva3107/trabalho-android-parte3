@@ -15,13 +15,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// CRUD das categorias do usuário logado.
 class CategoriaViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = CategoriaDao(application)
 
     var categorias by mutableStateOf<List<Categoria>>(emptyList())
         private set
-    // null = categoria nova (tela em modo "criar")
     var categoria by mutableStateOf<Categoria?>(null)
         private set
     var nome by mutableStateOf("")
@@ -33,8 +31,6 @@ class CategoriaViewModel(application: Application) : AndroidViewModel(applicatio
     var mensagem by mutableStateOf<String?>(null)
         private set
 
-    // Roda a operação em segundo plano (Dispatchers.IO).
-    // A operação recebe o id de quem está logado (sem sessão, não roda).
     private fun executar(op: (usuarioId: Long) -> Unit) {
         if (carregando || salvo) return
         carregando = true
@@ -75,7 +71,6 @@ class CategoriaViewModel(application: Application) : AndroidViewModel(applicatio
         mensagem = null
     }
 
-    // Sem categoria selecionada cria uma nova; com categoria selecionada altera.
     fun salvar() = executar { usuarioId ->
         CadastroValidator.validarCategoria(nome)
         val selecionada = categoria

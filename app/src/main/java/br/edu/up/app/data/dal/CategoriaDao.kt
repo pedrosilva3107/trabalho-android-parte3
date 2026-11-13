@@ -5,7 +5,6 @@ import android.content.Context
 import br.edu.up.app.data.local.AppDatabase
 import br.edu.up.app.data.model.Categoria
 
-// CRUD da tabela "categorias". Toda consulta filtra pelo usuario_id.
 internal class CategoriaDao(context: Context) {
     private val appContext = context.applicationContext
 
@@ -62,7 +61,6 @@ internal class CategoriaDao(context: Context) {
         }
     }
 
-    // As notas dessa categoria não são apagadas: só ficam "sem categoria" (categoria_id = 0).
     fun excluir(id: Long, usuarioId: Long) {
         AppDatabase(appContext).use { db ->
             val semCategoria = ContentValues().apply { put("categoria_id", 0L) }

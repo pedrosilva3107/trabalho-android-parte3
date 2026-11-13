@@ -26,8 +26,6 @@ import br.edu.up.app.ui.components.CampoTexto
 import br.edu.up.app.ui.components.TituloTela
 import br.edu.up.app.ui.viewmodel.CategoriaViewModel
 
-// Create, Update e Delete do CRUD de categorias.
-// Recebe o id pela rota CategoriaForm(id): 0 = nova categoria.
 @Composable
 fun CategoriaFormScreen(
     categoriaId: Long,
@@ -49,7 +47,6 @@ fun CategoriaFormScreen(
 
     var confirmarExclusao by remember { mutableStateOf(false) }
 
-    // imePadding + verticalScroll: com o teclado aberto dá para rolar até o botão Salvar.
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,7 +78,6 @@ fun CategoriaFormScreen(
             }
 
             if (editando) {
-                // Primeiro toque pede confirmação; o segundo exclui.
                 TextButton(
                     onClick = {
                         if (confirmarExclusao) {

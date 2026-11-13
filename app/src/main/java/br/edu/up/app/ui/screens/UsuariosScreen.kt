@@ -27,7 +27,6 @@ import br.edu.up.app.ui.components.PostitCard
 import br.edu.up.app.ui.theme.TextoPostit
 import br.edu.up.app.ui.viewmodel.UsuarioViewModel
 
-// Read do CRUD de usuários.
 @Composable
 fun UsuariosScreen(
     usuarioViewModel: UsuarioViewModel,
@@ -35,7 +34,6 @@ fun UsuariosScreen(
     onNovo: () -> Unit,
     onAbrir: (Long) -> Unit
 ) {
-    // Busca os usuários no banco ao abrir a tela.
     LaunchedEffect(Unit) {
         usuarioViewModel.listar()
     }
@@ -43,14 +41,11 @@ fun UsuariosScreen(
     val usuarios = usuarioViewModel.usuarios
     val idLogado = usuarioViewModel.usuarioLogadoId()
 
-    // contentAlignment = BottomEnd deixa o botão + no canto de baixo à direita.
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-
-            // Quantidade de usuários (o título "Usuários" fica na barra do topo).
             Text(
                 text = if (usuarios.size == 1) "1 cadastrado" else "${usuarios.size} cadastrados",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -70,7 +65,6 @@ fun UsuariosScreen(
                     )
                 }
 
-                // Espaço no fim da lista para o último cartão não ficar embaixo do botão +.
                 item { Spacer(modifier = Modifier.height(88.dp)) }
             }
         }

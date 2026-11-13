@@ -5,9 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
-// Aparência do app: cor do post-it, tamanho da fonte e modo escuro.
 class OpcoesViewModel : ViewModel() {
-
     var modoEscuro by mutableStateOf(false)
         private set
 

@@ -43,7 +43,6 @@ fun OpcoesScreen(opcoesViewModel: OpcoesViewModel) {
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Rotulo("COR DO POST-IT")
 
             PostitCard(
@@ -63,7 +62,6 @@ fun OpcoesScreen(opcoesViewModel: OpcoesViewModel) {
                 modifier = Modifier.padding(top = 16.dp)
             ) {
                 CORES_POSTIT.forEachIndexed { i, cor ->
-                    // Círculo da cor com um anel em volta; o anel é mais grosso na cor escolhida.
                     Surface(
                         modifier = Modifier
                             .size(36.dp)
@@ -86,7 +84,6 @@ fun OpcoesScreen(opcoesViewModel: OpcoesViewModel) {
 
             val podeDiminuir = tamanhoFonte > 12
             val podeAumentar = tamanhoFonte < 24
-            // Botão desativado fica com a cor do texto mais apagada.
             val corApagada = corTexto.copy(alpha = 0.38f)
 
             Row(
@@ -120,7 +117,6 @@ fun OpcoesScreen(opcoesViewModel: OpcoesViewModel) {
                 }
             }
 
-            // Texto à esquerda e o botão à direita.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -32,8 +32,6 @@ import br.edu.up.app.ui.components.FaixaTopo
 import br.edu.up.app.ui.viewmodel.OpcoesViewModel
 import kotlinx.coroutines.launch
 
-// Menu lateral (gaveta) + barra do topo com o botão ☰.
-// O menu só aparece com usuário logado (nunca no login/cadastro).
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Menu(opcoesViewModel: OpcoesViewModel) {
@@ -41,7 +39,6 @@ fun Menu(opcoesViewModel: OpcoesViewModel) {
     val entradaAtual by navController.currentBackStackEntryAsState()
     val destino = entradaAtual?.destination
 
-    // (nome, rota, selecionado)
     val itens = listOf(
         Triple(
             "Notas", ListaNotas,
@@ -69,7 +66,6 @@ fun Menu(opcoesViewModel: OpcoesViewModel) {
     )
     val titulo = itens.firstOrNull { it.third }?.first ?: "Notas"
 
-    // Login e Cadastro são as telas públicas: nelas o menu não aparece.
     val telaPublica = (destino?.hasRoute<Login>() ?: false) ||
             (destino?.hasRoute<Cadastro>() ?: false)
     val mostrarMenu = SessaoUsuario.usuario != null && destino != null && !telaPublica
@@ -101,7 +97,6 @@ fun Menu(opcoesViewModel: OpcoesViewModel) {
                                 escopo.launch {
                                     menu.close()
                                     if (!selecionado) {
-                                        // A lista de notas fica sempre na base da pilha.
                                         navController.navigate(rota) {
                                             popUpTo<ListaNotas>()
                                             launchSingleTop = true
@@ -141,7 +136,6 @@ fun Menu(opcoesViewModel: OpcoesViewModel) {
                         FaixaTopo()
                     }
                 } else {
-                    // Login e Cadastro: só a faixa roxa, abaixo da barra de status.
                     Column(modifier = Modifier.statusBarsPadding()) {
                         FaixaTopo()
                     }

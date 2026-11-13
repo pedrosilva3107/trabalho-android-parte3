@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// CRUD de usuários (só com sessão ativa).
 class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = UsuarioDao(application)
 
@@ -40,10 +39,8 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     var mensagem by mutableStateOf<String?>(null)
         private set
 
-    // Id de quem está logado (para marcar "você" nas telas).
     fun usuarioLogadoId(): Long? = SessaoUsuario.usuario?.id
 
-    // Roda a operação em segundo plano (Dispatchers.IO), só com sessão ativa.
     private fun executar(op: () -> Unit) {
         if (carregando || salvo || excluido) return
         carregando = true
@@ -90,7 +87,6 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         if (!carregando) login = valor
     }
 
-    // Senha em branco mantém a senha atual.
     fun salvar(novaSenha: String) = executar {
         val selecionado = usuario
         require(selecionado != null) { "Selecione um usuário." }
@@ -112,11 +108,10 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
 
         val atualizado = selecionado.copy(nome = nomeLimpo, login = loginLimpo)
         usuario = atualizado
-        SessaoUsuario.atualizar(atualizado) // se for você, a sessão já mostra o nome novo
+        SessaoUsuario.atualizar(atualizado)
         salvo = true
     }
 
-    // Quem decide o que fazer depois (voltar ou encerrar a sessão) é a navegação.
     fun excluir() = executar {
         val selecionado = usuario
         require(selecionado != null) { "Selecione um usuário." }

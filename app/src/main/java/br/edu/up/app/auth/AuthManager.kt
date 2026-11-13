@@ -5,7 +5,6 @@ import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
-// Gera e confere o hash das senhas (PBKDF2 + salt). A senha nunca vai pro banco em texto.
 object AuthManager {
     private const val ITERACOES = 100_000
 
